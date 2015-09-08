@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<p>
+<img width=55% src="images/Model-TrackingTask.png" alt="Model-TrackingTask">
+</p>
+
+<p>
+A tracking task model should have the standard form shown above, and it should
+be stored inside the <i>TrackingTasks</i> package.  It includes one block from
+the <i>ForcingFunctions.ReferenceSignals</i>, 
+<i>ForcingFunctions.DisturbanceInputs</i>, and 
+<i>ControlledElements</i> packages, each connected to the appropriate port of
+a <i>ManualController</i> block.   
+</p>
+
+<p>
+An additional component, the <i>TaskSettings</i> block, must be included.  This
+block contains important details of the tracking task: <b>taskDuration</b> is 
+the total length of the task; <b>previewTime</b> is the amount of time in advance
+to show the target motion; and <b>backgroundVisible</b> determines whether or not 
+pursuit (background) information is shown.  The last two parameters are only used
+in the user experiment, and not in the parameter tuning or simulation functions.
+The <i>TrackingTasks.FromReferences</i> package provides a few manual tracking
+tasks from the literature.
+</p>

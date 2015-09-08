@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<p>
+<img width=50% src="./images/Diagr-MassiveCart.png" alt="Diagr-MassiveCart">
+</p>
+
+The <i>controlled element</i> is the dynamic response of the cursor to control
+input, and it represents the real-world system under human control.  A simple 
+mechanical example is shown above.  A rolling cart is attached to ground by a 
+damper, and the control input pushes the cart with a force proportional to 
+<b>K</b>.  The equivalent controlled-element transfer function is shown in the
+right side of the figure.  The cart exhibits a lagged velocity response with
+time constant <b>M/b</b> and steady-state velocity <b>K/b</b>.  The units of
+these parameters depend on the units chosen for <b>M</b>, <b>b</b>, and 
+<b>K</b>.  
+
+<p>
+Simple models have been used to capture the primary behavior of certain
+degrees of freedom in aircraft, automobiles, and other complicated systems.
+Many experiments have used the simplest controlled elements with position,
+velocity, and acceleration responses. 
+</p>
+
+<p>
+<img width=50% src="./images/Table-ControlledElements.png" alt="Table-ControlledElements">
+</p>
+
+<p>
+All controlled elements included in the library are shown in the above table.
+There are the basic position, velocity, and acceleration responses.  There
+are also versions of these basic responses with an added first-order lag, 
+making them less responsive at first, but eventually reaching the same
+steady-state position/velocity/acceleration.
+</p>
+
+<p>
+The unstable <i>FirstOrderDivergent</i> controlled element was used to 
+investigate limitations of a human's effective time delay in Jex et al. (1966).
+The <i>VelocityFlexibleMode</i> includes a second order mode that can be 
+oscillatory.  This controlled element was studied with relatively high damping
+in Shirley and Young (1968), and with very low damping in Potter and Singhose
+(2013).
+</p>
