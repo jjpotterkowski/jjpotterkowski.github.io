@@ -1,167 +1,710 @@
 <!DOCTYPE html>
-<h1>
-    ManualTracking
-</h1>
-<h2>
-    A Modelica library for manual control
-</h2>
+<html>
+<head>
+<style>
+img {
+    max-width:100%;
+}
+header {
+    background-color:black;
+    color:white;
+    text-align:center;
+    padding-top:1px;
+    padding-bottom:1px;
+}
+mc {
+    font-weight:bold;
+    font-family:arial;
+}
+fv {
+    font-weight:bold;
+    font-family:courier;
+}
+section {
+    background-color:black;
+    color:white;
+    text-align:center;
+    padding-top:1px;
+    padding-bottom:1px;
+}
+rounded {
+    background-color:white; 
+    color:black;
+    padding:5px;
+    font-weight:bold;
+    border-radius:10px;
+}
+span.reverse {
+  unicode-bidi: bidi-override;
+  direction: rtl;
+}
+</style>
+</head>
+<body>
+
+<a name="top">
+<header>
+<h1> A Modelica library for manual tracking </h1>
+<p><a style="text-decoration: none" href="https://github.com/jjpotterkowski/ManualTracking/archive/master.zip"><rounded> &nbsp;<img src="./images/Icon-Download.png" height="12">&nbsp;Download ManualTracking&nbsp; </rounded></a></p>
+<p>Original author: James Jackson Potter (<span class="reverse">moc.liamg@ikswokrettopjj</span>)<br>Library release date: September 2015</p>
+</header>
+
 <p>
-<a href="https://github.com/jjpotterkowski/ManualTracking/archive/master.zip">Click here to download</a> the current version of the ManualTracking Modelica library.
+This work was funded by an <a href=\"https://fellowship.ercim.eu\">Alain 
+Bensoussan post-doctoral fellowship</a> from the
+<a href=\"http://www.ercim.eu\">European Research Consortium for Informatics and Mathematics</a> (ERCIM)</li></ul><br>
 </p>
+
+<p>
+<img src="./images/Icon-Right.png" height="12">&nbsp;<a href="#over">Overview</a><br>
+<img src="./images/Icon-Right.png" height="12">&nbsp;<a href="#soft">Software Requirements</a><br>
+<img src="./images/Icon-Right.png" height="12">&nbsp;<a href="#back">Background Information</a><br>
+<img src="./images/Icon-Right.png" height="12">&nbsp;<a href="#pack">Package Description</a><br>
+<img src="./images/Icon-Right.png" height="12">&nbsp;<a href="#exam">Example</a><br>
+<img src="./images/Icon-Right.png" height="12">&nbsp;<a href="#lic">License</a><br>
+<img src="./images/Icon-Right.png" height="12">&nbsp;<a href="#ack">Acknowledgements</a><br>
+<img src="./images/Icon-Right.png" height="12">&nbsp;<a href="#ref">References</a>
+</p>
+
+<!--%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%-->
+<!--/////////////////////////////////////////////////////////////////////////////-->
+<!--%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%-->
+<a name="over">
+<a href="#top"><img src="./images/Icon-Top.png" height="12">&nbsp;Go to top</a>
+<section><h1>Overview</h1></section>
+<p>
+Many systems require a human to perform real-time control. To simulate these systems, a dynamic model of the human's control behavior is needed.  The field of manual control has developed and validated such models, and this library contains implementations of a collection of these models from the literature.  Python-based tools allow users to perform, in real time, the manual tracking tasks they design in Modelica.  Parameter values in the manual controller models can be automatically tuned to either maximize tracking performance, or to match recorded control input from a user experiment.
+</p>
+<p align="center"><img align="center" width="886px" src="./images/Misc-Overview.png"/><br><br>
+</p>
+
+<!--%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%-->
+<!--/////////////////////////////////////////////////////////////////////////////-->
+<!--%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%-->
+<a name="soft">
+<a href="#top"><img src="./images/Icon-Top.png" height="12">&nbsp;Go to top</a>
+<section><h1>Software Requirements</h1></section>
+<p>
+<strong>For Modelica library:</strong><br>
+<a href="https://modelica.org/tools">Modelica</a><br>
 <br>
-<h3>
-    Information
-</h3>
+<strong>For Python functions:</strong><br>
+<a href="https://www.python.org/downloads/">Python 2.7</a><br>
+<a href="http://pygame.org/download.shtml">Pygame</a><br>
+<a href="https://www.openmodelica.org/">OpenModelica</a><br>
+<a href="https://github.com/OpenModelica/OMPython">OMPython</a><br>
+<a href="http://jmodelica.org/binary">JModelica.org</a>
+</p>
+
+<!--%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%-->
+<!--/////////////////////////////////////////////////////////////////////////////-->
+<!--%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%-->
+<a name="back">
+<a href="#top"><img src="./images/Icon-Top.png" height="12">&nbsp;Go to top</a>
+<section><h1>Background Information</h1></section>
 <p>
-    Many systems require a human to perform real-time control. Examples include aiming a tank turret [1], driving an automobile [2], and piloting an aircraft
-    [3].To simulate these systems, a dynamic model of the human's control behavior is needed. The field of manual control has developed and validated such
-    models, and their implementation in Modelica could support researchers of human-machine systems. This paper presents a Modelica library with models from
-    the manual control literature. Python-based tools allow users to perform, in real time, the manual tracking tasks they design in Modelica. Parameter values
-    in the manual controller models can be automatically tuned to either maximize tracking performance, or to match recorded control input from a user
-    experiment.
+There are many situations where a human operator attempts to make the output of a system follow a desired trajectory.  For example, the top of Figure 1 shows the task of recording an athlete with a tripod-mounted video camera. The goal of the camera operator is to keep the athlete centered in the camera frame. The actual camera direction is compared to its desired direction (pointed directly at the athlete), and corrective actions are made by applying force to the tripod handle. This activity is similar to eye tracking, where a human keeps a moving object in the center of his or her vision (Jagacinski, 1977). In these activities, the human is an active part of a feedback control system. Other examples of manual tracking tasks include aiming a tank turret (Tustin, 1947; Kleinman and Perkins, 1974), driving an automobile (Bekey et al., 1977; Hess and Modjtahedzadeh, 1990), and piloting an aircraft (McRuer and Jex, 1967).
 </p>
 <p>
-    <img width="50%" src="./images/Misc-Overview.png"/>
+The bottom of Figure 1 shows a simplified diagram of the task. Blocks represent the camera operator's control behavior, and the camera and tripod's rotational dynamics.  The athlete's direction relative to the tripod is the reference signal, <em>r</em>(t), the camera's actual direction is the camera state, <em>y</em>(t), and the angle between the actual and desired directions is the error, <em>e</em>(t). The operator's force on the handle is the command input, <em>u</em>(t).
 </p>
-<h3>
-    References
-</h3>
-<p>
-[1] A. Tustin, “The nature of the operator’s response in manual control, and its implications for controller design,”    <em>Journal of the Institution of Electrical Engineers</em>, vol. 94, no. 2, pp. 190–206, May 1947.
+<p align="center"><img align="center" width="460px" src="./images/Diagr-VideoCamera.png"/><br><br><strong>Figure 1.</strong> One-dimensional video camera tracking task.
 </p>
 <p>
-    [2] R. A. Hess and A. Modjtahedzadeh, “A control theoretic model of driver steering behavior,” <em>IEEE Control Systems Magazine</em>, vol. 10, no. 5, pp.
-    3–8, Aug. 1990.
+Note that to simulate this system, a model of the human's control behavior must be specified.  Such models can be found in the field of manual control, which uses the tools and techniques of control theory to study the control behavior of humans. A Modelica library that captures knowledge from this field would be useful to modelers of human-machine systems.
 </p>
 <p>
-    [3] D. T. McRuer and H. R. Jex, “A review of quasi-linear pilot models,” <em>IEEE Transactions on Human Factors in Electronics</em>, vol. HFE-8, no. 3, pp.
-    231–249, Sep. 1967.
+This website presents a library with models of human control behavior from the manual control literature.  In addition, tools allow users to perform manual tracking tasks designed in Modelica, and to tune parameter values in the manual controller models to either maximize tracking performance, or to match recorded control input from user experiments.
 </p>
+<h2>Manual Tracking</h2>
+<p>
+Previous studies have made extensive use of single-axis manual tracking tasks to investigate the control behavior of humans performing continuous control.  In a typical experimental tracking task, a human operator views a display on a computer screen and uses an input device, such as a joystick or force stick, to generate control input.  An example display is shown in Figure 2.  There are two objects on the screen: one is a <em>target</em> that represents the reference (desired) state, and the other is a <em>cursor</em> that represents the actual state of the controlled system.  The human's goal is to make the cursor follow the target as closely as possible.  
+</p>
+<p align="center"><img align="center" width="458px" src="./images/Diagr-TrackingDisplay.png"/><br><br><strong>Figure 2.</strong> Display for manual tracking task.
+</p>
+<p>
+Many situations require humans to perform multi-axis, multi-loop control tasks, so it might seem that studying one-dimensional control would be an unreasonable oversimplification. However, it has been found that multi-axis tracking performance is highly related to one-axis tracking (Todosiev et al., 1967), and that information about the human controller derived from single-axis tracking tasks can be applied to multi-loop tasks (McRuer et al., 1975).
+</p>
+<h2>Forcing Functions</h2>
+<p>
+In the tracking display of Figure 2, the target's motion is prescribed by a forcing function.  This function should appear random to prevent the operator from predicting future behavior of the target, unless the real-world control task consists of highly predictable signals.  This library, and much of manual control theory, focuses on the tracking of unpredictable signals.  
+</p>
+<p>
+From past studies, it has been shown that the sum of 5 or more sine waves is unpredictable to human operators (McRuer et al., 1965).  An example summed-sine forcing function is shown in Figure 3.  The individual sine waves on the left of Figure 3 are combined to yield the more complicated function on the right.
+</p>
+<p align="center"><img align="center" width="452px" src="./images/Time-SummedSines.png"/><br><br><strong>Figure 3.</strong> Sum of sines forcing function.
+</p>
+<p>
+In general, low-frequency sine waves are given large amplitudes, and waves with increasing frequency are given increasingly small amplitudes (Jagacinski and Flach, 2003).  The difficulty of tracking a given forcing function depends heavily on the velocity and acceleration of the target motion (Damveld et al., 2010).
+</p>
+<h2>Controlled Elements</h2>
+<p>
+The <em>controlled element</em> is the dynamic response of the cursor to control input, and it represents the real-world system under human control.  A simple mechanical example is shown in the left side of Figure 4.  A rolling cart with mass <em>M</em> is attached to ground by a damper with damping coefficient <em>b</em>, and the control input pushes the cart with a force of magnitude <em>Ku</em>(t).  The equivalent controlled-element transfer function is shown in the right side of Figure 4.  The cart exhibits a lagged velocity response with time constant <em>M/b</em> and steady-state velocity <em>K/b</em>.  The units of these parameters depend on the units chosen for <em>M</em>, <em>b</em>, and <em>K</em>.
+</p>
+<p align="center"><img align="center" width="416px" src="./images//Diagr-MassiveCart.png"/><br><br><strong>Figure 4.</strong> Mechanical example of a controlled element.
+</p>
+<p>
+Simple models have been used to capture the primary behavior of certain degrees of freedom in aircraft (McRuer and Jex, 1967), automobiles, and other complicated systems.  Many experiments have used the simplest controlled elements with position, velocity, and acceleration responses. 
+</p>
+<h2>Manual Controllers</h2>
+<p>
+Human control behavior while tracking an unpredictable signal can be modeled using tools and techniques from control theory.  A specific model will be called a <em>manual controller</em> model.  These models are generally either structural or algorithmic in nature (McRuer, 1980).  Structural models use explicit equations and parameters to model human control pathways and the human's resulting input-output response.  Algorithmic models use a more implicit optimal control formulation, where only the human's total response is computed.  This library includes only structural models.  For a review of both kinds of models, see Hess (2006).
+</p>
+<p>
+Structural manual controller models have taken many forms, but most include one or more of the control pathways shown in Figure 5.  Nearly all controllers include the <em>compensatory</em> pathway, which acts on the error <em>e</em>(t) between the reference and measured state.  Manual tracking experiments that display only this error, and not the reference and measured states independently, are called compensatory tracking tasks.
+</p>
+<p align="center"><img align="center" width="940px" src="./images//Block-ManualController.png"/><br><br><strong>Figure 5.</strong> Manual controller signals and control pathways.
+</p>
+<p>
+If both the reference state and the measured state are displayed to the human, then they can be used for the <em>feedforward</em> and <em>pursuit</em> control actions.  The presence of pursuit information does not guarantee pursuit control will be used, and the absence of pursuit information does not guarantee pursuit control will not be used.  
+</p>
+<p>
+The <em>neuromuscular</em> filter accounts for the lag imposed by limb dynamics and neuromuscular delays.  The human senses the filtered input using the <em>proprioceptive</em> pathway, and compares it to the desired input.
+</p>
+<p>
+Once the human's control input is determined, a <em>disturbance input</em> is added.  This can be used for a disturbance rejection task (Van Paassen and Mulder, 2006), or to add <em>remnant</em> to the controller model.  Remnant accounts for the human's control input that is not predicted by the model.  Most of the remnant appears to come from fluctuations in the effective time delay (McRuer 1980), nonsteady control behavior, and nonlinear anticipation or relay-like operations (McRuer et al., 1967). These effects are larger when tracking conditions are difficult (Hess, 1979).  The remnant has been found to have fairly constant power with no major peaks, and it tends to be relatively small when tracking conditions are favorable (Wade and Jex, 1972).
+</p>
+
+<!--%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%-->
+<!--/////////////////////////////////////////////////////////////////////////////-->
+<!--%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%-->
+<a name="pack">
+<a href="#top"><img src="./images/Icon-Top.png" height="12">&nbsp;Go to top</a>
+<section><h1>Package Description</h1></section>
+<p>
+The previous section described elements of typical manual tracking tasks, and this section presents their implementation in the <mc>ManualTracking</mc> Modelica library.  An overview of the library structure is shown in Figure 6.  Packages in the library will be described in order from least to most complex, ending with the <mc>TrackingTasks</mc> package.  An instance of a tracking task requires instances from the <mc>ManualControllers</mc>, <mc>ControlledElements</mc>, and <mc>ForcingFunctions</mc> packages.  The <mc>Blocks</mc> and <mc>Icons</mc> packages are straightforward, and will not be discussed.
+</p>
+<p align="center"><img align="center" width="945px" src="./images//Tree-Library.png"/><br><strong>Figure 6.</strong> ManualTracking library overview.
+</p>
+<h2><mc>ForcingFunctions</mc></h2>
+<p>
+This package only includes the summed sine wave signal, which is by far the most common signal used in manual tracking tasks.  Frequency values can be either in units of Hz (with <mc>SumOfSinesHz</mc>), or radians per second (with <mc>SumOfSinesRadPerSec</mc>).  If the user wishes to make a custom forcing function for either the reference signal or disturbance input, the signal must be contained in one block with a single output, and it must be stored in the appropriate package.  If these rules are violated, the Python functions will not be able to parse the text of the tracking task.
+</p>
+<h2><mc>ControlledElements</mc></h2>
+<p>
+All controlled elements included in the library are shown in Table 1.  There are the basic position, velocity, and acceleration responses.  There are also versions of these basic responses with an added first-order lag, making them less responsive at first, but eventually reaching the same steady-state position/velocity/acceleration.
+</p>
+<p align="center"><strong>Table 1.</strong> Controlled elements.<br><br><img align="center" width="485px" src="./images//Table-ControlledElements.png"/>
+</p>
+<p>
+The unstable <mc>FirstOrderDivergent</mc> controlled element was used to investigate limitations of a human's effective time delay in Jex et al. (1966). The <mc>VelocityFlexibleMode</mc> includes a second order mode that can be oscillatory.  This controlled element was studied with relatively high damping in Shirley and Young (1968), and very low damping in Potter and Singhose (2014).
+</p>
+<h2><mc>ManualControllers</mc></h2>
+<p>
+Table 2 shows all manual controller models in equation form.  The <mc>ManualTracking</mc> library documentation contains block diagrams of each controller model, and these block diagrams are sometimes more intuitively useful than the equations.
+</p>
+<p align="center"><strong>Table 2.</strong> Manual controllers.<br><br><img align="center" width="995px" src="./images//Table-ManualControllers.png"/>
+</p>
+McRuer and Jex (1967) describe how the first four manual controllers are combined with specific controlled elements to yield the form of the Crossover model.  The model <mc>PrecisionOriginal</mc> was proposed by McRuer and his colleagues, and various simplified versions with one of the lead-lag terms removed have been used since then.  These versions mainly differ in how they represent the human's neuromuscular filter.  The <mc>MultichannelModel</mc>, <mc>MultimodalModel</mc>, and <mc>DescriptiveModel</mc> each include pursuit control, but they have different ways of organizing the human's control pathways.  
+</p>
+<p>
+The following two models, <mc>StructuralFor1stOrder</mc> and <mc>StructuralFor2ndOrder</mc>, include proprioceptive feedback, and are designed to control first-order and second-order controlled elements, respectively.  The <mc>FeedforwardModel</mc> includes feedfoward control.  For this control pathway, an inverted model of the plant dynamics is needed, and the controller automatically uses the block <mc>ManualTracking.Blocks.FeedForward</mc> for this purpose.  To change the inverse dynamics block, or to make the controller use a different block, the Modelica file text must be modified manually.
+</p>
+<h2><mc>TrackingTasks</mc></h2>
+<p>
+Blocks from the <mc>ForcingFunctions</mc>, <mc>ControlledElements</mc>, and <mc>ManualControllers</mc> packages can be useful by themselves, in any configuration that supports the user's model.  However, to use the parameter tuning and user experiment features of this library, a specific configuration of the components is required.
+</p>
+<p>
+A tracking task model should have the standard form shown in Figure 7, and it should be stored inside the <mc>TrackingTasks</mc> package.  It includes one block from the <mc>ForcingFunctions.ReferenceSignals</mc>, <mc>ForcingFunctions.DisturbanceInputs</mc>, and <mc>ControlledElements</mc> packages, each connected to the appropriate port of a <mc>ManualController</mc> block.  Several manual tracking tasks from the literature are provided.
+</p>
+<p align="center"><img align="center" width="450px" src="./images//Model-TrackingTask.png"/><br><br><strong>Figure 7.</strong> Example of tracking task.
+</p>
+<p>
+An additional component, the <mc>TaskSettings</mc> block, must be included.  This block contains important details of the tracking task: <fv>taskDuration</fv> is the total length of the task; <fv>previewTime</fv> is the amount of time in advance to show the target motion; and <fv>backgroundVisible</fv> determines whether or not pursuit (background) information is shown with hatch marks.  The last three parameters are only used in the user experiment, and not in the parameter tuning or simulation functions.
+</p>
+<h2>Python Functions</h2>
+<p>
+The previous sections have described purely Modelica-based components that can be run from within a Modelica simulation environment.  Two additional capabilities are provided in the <mc>ManualTracking</mc> library: automatically tuning manual controller parameters, and performing real-time tracking experiments.  These features are implemented in the Python programming language.
+</p>
+<p>
+An overview of the software is shown in Figure 8.  In the {\small\dirfont{Resources/}} directory, there are 5 .py files.  Four of these are function scripts that can be run from a terminal or Python IDE, and the fifth file is <fv>Options.py</fv>, where options are set by the user.  The functions do not use input arguments, and instead get them from <fv>Options.py</fv>.  Variables in this file include: <fv>taskModel</fv>, the tracking task model to run; <fv>saveFormat</fv>, the format with which to save backup data files; <fv>printVerbose</fv>, whether or not to print all runtime messages to the console.  The user may also experiment with different framerates and optimization/simulation methods.
+</p>
+<p align="center"><img align="center" width="947px" src="./images//Diagr-SoftwareOverview.png"/><br><br><strong>Figure 8.</strong> Software overview.
+</p>
+<p>
+<fv>Options.py</fv> also contains Boolean input arguments for each of the four functions: <fv>useSaved</fv> makes the functions use most recent saved data (in <fv>Resources/Temp/</fv> directory) instead of re-running an experiment; <fv>plotResults</fv> generates a figure with the resulting trajectories; and <fv>saveResults</fv> saves a backup results file in the <fv>Resources/Data/</fv> directory.  The results file contains values for the reference state, measured state, disturbance input, and control input at each sample time.
+</p>
+<p>
+Each of the four main functions call <fv>mantra.py</fv>, which reads the <fv>ManualTracking.mo</fv> file for details of the tracking task, and then calls functions defined in <fv>fmi.py</fv>, <fv>game.py</fv>, and <fv>tools.py</fv>.  These functions use standard Python modules, as well as OMPython, pyfmi, Pygame, and matplotlib.  Note that OMPython requires an installation of OpenModelica (Fritzson et al., 2005).  Additionally, pyfmi has many dependencies that must be installed first, and it may be more convenient to install JModelica.org (&#196;kesson et al., 2010) instead of installing them individually.  After all required Python modules have been installed, the following functions should run successfully.
+</p>
+<h3><fv>RunTrackingSimulation</fv></h3>
+<p>
+This function simulates the tracking task model specified in <fv>Options.py</fv>.  The simulation stop time is specified by <fv>taskDuration</fv> in the <fv>TaskSettings</fv> block.  All files are saved into the <fv>Resources/Temp/</fv> directory.  Generated files include log files, FMU build files, and a comma-separated value (CSV) file of simulation results.  If <fv>saveResults</fv> is true, this CSV file is also saved in the <fv>Resources/Data/</fv> directory.  If <fv>plotResults</fv> is true, then time-curves of <em>r</em>(t), <em>y</em>(t), <em>w</em>(t), and <em>u</em>(t) are plotted, as shown in Figure 9.  The matplotlib Python module is required for this feature.
+</p>
+<p align="center"><img align="center" width="458px" src="./images//Time-SimulationOutput.png"/><br><br><strong>Figure 9.</strong> Plot of simulation results.
+</p>
+<h3><fv>RunTrackingExperiment</fv></h3>
+<p>
+This function allows the user to perform a tracking task in real time.  The tracking task model specified in <fv>Options.py</fv> is parsed, and details of the experiment are extracted from the <mc>TaskSettings</mc> block.  Next, the reference signal and disturbance input are generated by building them into separate FMUs, and simulating them for the duration of the experiment.  These signals are not affected by the user input or controlled element state, and therefore they can be simulated open loop.       
+</p>
+<p>
+Next, Pygame looks for any joysticks connected to the computer.  If no joystick is found, then the keyboard arrow keys may be used for control input.  When a joystick is used, the experiment runs more smoothly and the parameter-fitting functions work much more effectively.  Therefore, using a joystick for the experiment is highly recommended.
+</p>
+<p>
+Then, two scaling factors are automatically calculated.  One is the <fv>display gain</fv>, which determines how far to move display objects (in pixels) based on the reference and measured state magnitudes, which are in unknown units of length.  The other is the <fv>input gain</fv>, which determines the magnitude of input to the controlled element based on the joystick or keyboard input between -1 (full left) and 1 (full right).  
+</p>
+<p>
+Finally, the user is prompted to start the experiment.  The tracking display is shown in Figure 10.  Lines on the top and bottom of the screen mark the global coordinates, so that the target motion can be seen independently of the cursor motion.  These lines can be hidden to create a compensatory task by setting <fv>backgroundVisible</fv> to false in the <mc>TaskSettings</mc> block.
+</p>
+<p align="center"><img align="center" width="416px" src="./images//Diagr-DisplayScreen.png"/><br><br><strong>Figure 10.</strong> Display of manual tracking experiment.
+</p>
+<p>
+Figure 10 also shows a preview of the target motion.  Future motion is indicated by circles falling from the top of the screen.  The topmost circle shows where the target will be <fv>previewTime</fv> seconds in the future.  This feature can be disabled by setting <fv>previewTime</fv> to 0.
+</p>
+<p>
+If desired, the user may adjust fundamental settings of the game in the <fv>Resources/Source/game.py</fv> file.  Modifying these settings may cause errors, so it is a good idea to save a backup of the  <fv>game.py</fv> file before making modifications.
+</p>
+<h3><fv>TuneControllerSimulation</fv></h3>
+<p>
+This function repeatedly simulates the tracking task with different parameter values in the manual controller, and finds values which yield the best tracking performance.  This reflects an important finding in the literature: an experienced human operator has inherent human limitations (e.g., reaction time delay, neuromuscular lag, and ability to generate derivatives and higher-order leads), but behaves in a nearly optimal fashion given these limitations.  
+</p>
+<p>
+Mathematically, the function tries to minimize the integrated squared difference between <em>y</em>(t) and <em>r</em>(t).  This is shown conceptually in Figure 11(a), where <em>c</em>(t) is the continuous cost to minimize.  Because tracking performance is not a differentiable function of the controller parameters, a derivative-free optimization method such as the Nelder-Mead simplex method (Gedda et al., 2012) must be used.
+</p>
+<p align="center"><img align="center" width="945px" src="./images//Block-OptimizationGoals.png"/><br><br><strong>Figure 11.</strong> Tuning manual controller parameters by minimizing &#x222b;[<em>c</em>(t)]&sup2;dt.
+</p>
+<p>
+Some manual controller models contain many parameters, and attempting to tune all of them at once would be time-consuming and would likely yield poor results.  Therefore, the user is allowed to select a subset of the parameters using a console prompt like this:
+</p>
+<fv>
+Tunable controller parameters:<br>
+&nbsp;&nbsp;1. K -- Proportional gain<br>
+&nbsp;&nbsp;2. T2 -- Time constant of phase<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;lag compensation (s)<br>
+&nbsp;&nbsp;3. T1 -- Time constant of phase<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;lead compensation (s)<br>
 <br>
-<h3>
-    Library content
-</h3>
-<table border="1" cellspacing="0" cellpadding="0">
-    <tbody>
-        <tr>
-            <td colspan="2" align="center" valign="baseline">
-                <p>
-                    <strong>Modelica Packages</strong>
-                </p>
-            </td>
-        </tr>
-        <tr>
-            <td align="center" valign="baseline">
-                <p>
-                    <strong>Name</strong>
-                </p>
-            </td>
-            <td align="center" valign="baseline">
-                <p>
-                    <strong>Description</strong>
-                </p>
-            </td>
-        </tr>
-        <tr>
-            <td valign="baseline">
-                <p>
-                <a href="UsersGuide.html">
-                    <img width="18" height="18" src="./images/Icon-UsersGuide.png"/>
-                    UsersGuide
-                </a>
-                </p>
-            </td>
-            <td valign="baseline">
-                <p>
-                    User’s guide
-                </p>
-            </td>
-        </tr>
-        <tr>
-            <td valign="baseline">
-                <p>
-                <a href="TrackingTasks.html">
-                    <img width="18" height="18" src="./images/Icon-TrackingTasks.png"/>
-                    TrackingTasks
-                </a>
-                </p>
-            </td>
-            <td valign="baseline">
-                <p>
-                    Manual tracking tasks
-                </p>
-            </td>
-        </tr>
-        <tr>
-            <td valign="baseline">
-                <p>
-                <a href="ManualControllers.html">
-                    <img width="18" height="18" src="./images/Icon-ManualControllers.png"/>
-                    ManualControllers
-                </a>
-                </p>
-            </td>
-            <td valign="baseline">
-                <p>
-                    Manual controller models
-                </p>
-            </td>
-        </tr>
-        <tr>
-            <td valign="baseline">
-                <p>
-                <a href="ControlledElements.html">
-                    <img width="18" height="18" src="./images/Icon-ControlledElements.png"/>
-                    ControlledElements
-                </a>
-                </p>
-            </td>
-            <td valign="baseline">
-                <p>
-                    Controlled elements
-                </p>
-            </td>
-        </tr>
-        <tr>
-            <td valign="baseline">
-                <p>
-                <a href="ForcingFunctions.html">
-                    <img width="18" height="18" src="./images/Icon-ForcingFunctions.png"/>
-                    ForcingFunctions
-                </a>
-                </p>
-            </td>
-            <td valign="baseline">
-                <p>
-                    Forcing functions
-                </p>
-            </td>
-        </tr>
-        <tr>
-            <td valign="baseline">
-                <p>
-                    <img width="18" height="18" src="./images/Icon-Blocks.png"/>
-                    Blocks
-                </p>
-            </td>
-            <td valign="baseline">
-                <p>
-                    Miscellaneous blocks
-                </p>
-            </td>
-        </tr>
-        <tr>
-            <td valign="baseline">
-                <p>
-                    <img width="18" height="18" src="./images/Icon-Icons.png"/>
-                    Icons
-                </p>
-            </td>
-            <td valign="baseline">
-                <p>
-                    Icon graphics
-                </p>
-            </td>
-        </tr>
-    </tbody>
-</table>
+Please enter a comma-separated number<br>
+list specifying parameters to tune: _
+</fv>
+<p>
+To tune <fv>K</vf> and <vf>T1</vf>, for example, the user should type <fvf>1,3</vf> and press <vf>Enter</vf>.  The rest of the parameters are fixed so that they remain the same as in the manual controller component definition, unless they are re-assigned in the tracking task model.  
+</p>
+<h3><fv>TuneControllerExperiment</fv></h3>
+<p>
+This function tunes the automatic manual controller to behave as much as possible like the human controller.  The concept is shown in Figure 11(b).  The goal is to minimize the difference between the experimentally recorded control input, <em>u</em>(t), and the simulated control input, <em>&ucirc;</em>(t).
+</p>
+<p>
+The input to the manual controller is the reference signal (and disturbance input, not shown in Figure 11), and the experimentally recorded controlled element state.  Note that the tracking performance of the tuned controller might be very poor, because it does not attempt to optimize tracking performance.  It simply tries to match control behavior of the user.
+</p>
+<h2><fv>Notes</fv></h2>
+<ul>
+    <li>When selecting a controller model, one should consider details of the real-world task and controlled-element dynamics.  The Python functions do not check the appropriateness of a manual controller for the given tracking conditions.</li>  
+    <li>User-created <fv>ReferenceSignal</fv>, <fv>DisturbanceInput</fv>, <fv>controlledElement</fv>, and <fv>ManualController</fv> classes must be stored inside the appropriate packages.  The Python functions only search in these locations when parsing the tracking task.</li>
+
+    <li>While the keyboard can be used for control input in the tracking experiment, a joystick is highly recommended.  The parameter tuning functions work much better, and the display is smoother.</li>
+    
+    <li>Automatic syncing programs (Dropbox in particular, but possibly others) seem to cause a problem with the real-time user experiment.  Try exiting, or at least pausing, these programs if the experiment crashes repeatedly.</li>
+</ul>
+
+<!--%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%-->
+<!--/////////////////////////////////////////////////////////////////////////////-->
+<!--%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%-->
+<a name="exam">
+<a href="#top"><img src="./images/Icon-Top.png" height="12">&nbsp;Go to top</a>
+<section><h1>Example</h1></section>
+</p>
+<p>
+This section demonstrates basic use of the Modelica library and Python functions.  Load the <fv>ManualTracking</fv> library, go to the <fv>TrackingTasks</fv> package, and simulate one of the example tasks.  Plots of <fv>controlledelement1.y</fv> and <fv>referencesignal1.y</fv> should resemble the top plot of Figure 9, with the controlled element following the reference signal closely, but with a small time delay.
+</p>
+<p>
+Next, navigate to <fv>ManualTracking/Resources/</fv>, and open <fv>Options.py</fv>.  The <fv>taskModel</fv> variable should be assigned to one of the example tracking tasks, and <fv>printResults</fv> should be set to true.  Then run the script <fv>RunTrackingSimulation.py</fv>, either from a Python IDE or from a console window.  A few diagnostic messages should print to the console, and then a figure similar to Figure 9 should appear.  To reduce the amount of console output, set <fv>printVerbose</fv> to false.  
+</p>
+<p>
+If the function executed successfully, then try the real-time experiment.  Run <fv>RunTrackingExperiment.py</fv> and wait for the reference signal and disturbance inputs to be generated.  After a short time, the console should show this prompt:
+</p>
+<fv>
+Press 'Enter' to bring up the display,<br>
+then press any key except 'q' to start<br>
+the experiment: _<br>
+</fv>
+<p>
+After following these instructions, a window similar to Figure 10 appears.  Use either the arrow keys or a joystick to make the crosshairs follow the target.  Once the experiment is complete, a plot of the state and input trajectories is shown if <fv>printResults</fv> is set to true.  To examine the data file used for this plot, go to the <fv>Resources/Temp/</fv> directory, and look for the comma-separated-value (CSV) file <fv>ExampleTaskName_exp.csv</fv>.  The data file for the tracking simulation should also be in the same directory, saved as <fv>ExampleTaskName_sim.csv</fv>.
+</p>
+<p>
+Next, try the manual controller tuning functions.  Run the <fv>TuneControllerSimulation.py</fv>script.  When prompted, type <fv>1,3</fv> and press enter.  The optimization function prints information about the current parameter guesses and cost function value to the console.  Within a few minutes, the solver should converge, and parameter values for the parameters should be displayed.  A plot shows the simulated tracking performance using these parameter values.
+</p>
+<p>
+Instead of tuning parameters to yield the best tracking performance, they can be tuned to fit experimental tracking performance.  First, make sure <fv>useSaved</fv> is set to true in <fv>Options.py</fv>, otherwise the user experiment will be run again.  Then run the <fv>TuneControllerExperiment.py</fv> script.  Just like in the previous example, select the parameters you would like to tune, and the function should find their optimal values and display the simulated tracking results with the chosen controller values.
+</p>
+
+<!--%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%-->
+<!--/////////////////////////////////////////////////////////////////////////////-->
+<!--%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%-->
+<a name="lic">
+<a href="#top"><img src="./images/Icon-Top.png" height="12">&nbsp;Go to top</a>
+<section><h1>License</h1></section>
+
+<h2><a href="https://www.modelica.org/licenses/ModelicaLicense2">The Modelica License 2</a></h2>
+<p>
+<b>Preamble.</b> The goal of this license is that Modelica related
+model libraries, software, images, documents, data files etc. can be
+used freely in the original or a modified form, in open source and in
+commercial environments (as long as the license conditions below are
+fulfilled, in particular sections 2c) and 2d). The Original Work is
+provided free of charge and the use is completely at your own risk.
+Developers of free Modelica packages are encouraged to utilize this
+license for their work.</p>
+
+<p>
+The Modelica License applies to any Original Work that contains the
+following licensing notice adjacent to the copyright notice(s) for
+this Original Work:</p>
+
+<p><b>Licensed by James J. Potter under the Modelica License 2</b></p>
+
+<p><b>1. Definitions.</b></p>
+<ol type=\"a\">
+	<li>&ldquo;License&rdquo; is this Modelica License.</li>
+
+	<li>&ldquo;Original Work&rdquo; is any work of authorship, including
+	software, images, documents, data files, that contains the above
+	licensing notice or that is packed together with a licensing notice
+	referencing it.</li>
+
+	<li>&ldquo;Licensor&rdquo; is the provider of the Original Work who has
+	placed this licensing notice adjacent to the copyright notice(s) for
+	the Original Work. The Original Work is either directly provided by
+	the owner of the Original Work, or by a licensee of the owner.</li>
+
+	<li>&ldquo;Derivative Work&rdquo; is any modification of the Original
+	Work which represents, as a whole, an original work of authorship.
+	For the matter of clarity and as examples:
+
+	<ol  type=\"A\">
+		<li>Derivative Work shall not include work that remains separable from
+		the Original Work, as well as merely extracting a part of the
+		Original Work without modifying it.</li>
+
+		<li>Derivative Work shall not include (a) fixing of errors and/or (b)
+		adding vendor specific Modelica annotations and/or (c) using a
+		subset of the classes of a Modelica package, and/or (d) using a
+		different representation, e.g., a binary representation.</li>
+
+		<li>Derivative Work shall include classes that are copied from the
+		Original Work where declarations, equations or the documentation
+		are modified.</li>
+
+		<li>Derivative Work shall include executables to simulate the models
+		that are generated by a Modelica translator based on the Original
+		Work (of a Modelica package).</li>
+	</ol>
+
+	<li>&ldquo;Modified Work&rdquo; is any modification of the Original Work
+	with the following exceptions: (a) fixing of errors and/or (b)
+	adding vendor specific Modelica annotations and/or (c) using a
+	subset of the classes of a Modelica package, and/or (d) using a
+	different representation, e.g., a binary representation.</li>
+
+	<li>&quot;Source Code&quot; means the preferred form of the Original
+	Work for making modifications to it and all available documentation
+	describing how to modify the Original Work.</li>
+
+	<li>&ldquo;You&rdquo; means an individual or a legal entity exercising
+	rights under, and complying with all of the terms of, this License.</li>
+
+	<li>&ldquo;Modelica package&rdquo; means any Modelica library that is
+	defined with the &ldquo;<code><b>package</b>&nbsp;&lt;Name&gt;&nbsp;...&nbsp;<b>end</b>&nbsp;&lt;Name&gt;;</code>&rdquo; Modelica language element.</li>
+
+</ol>
+
+<p>
+<b>2. Grant of Copyright License.</b> Licensor grants You a
+worldwide, royalty-free, non-exclusive, sublicensable license, for
+the duration of the copyright, to do the following:</p>
+
+<ol type=\"a\">
+	<li><p>
+	To reproduce the Original Work in copies, either alone or as part of
+	a collection.</p></li>
+	<li><p>
+	To create Derivative Works according to Section 1d) of this License.</p></li>
+	<li><p>
+	To distribute or communicate to the public copies of the <u>Original
+	Work</u> or a <u>Derivative Work</u> under <u>this License</u>. No
+	fee, neither as a copyright-license fee, nor as a selling fee for
+	the copy as such may be charged under this License. Furthermore, a
+	verbatim copy of this License must be included in any copy of the
+	Original Work or a Derivative Work under this License.<br>
+	For the matter of clarity, it is permitted A) to distribute or
+	communicate such copies as part of a (possible commercial)
+	collection where other parts are provided under different licenses
+	and a license fee is charged for the other parts only and B) to
+	charge for mere printing and shipping costs.</p></li>
+	<li><p>
+	To distribute or communicate to the public copies of a <u>Derivative
+	Work</u>, alternatively to Section 2c), under <u>any other license</u>
+	of your choice, especially also under a license for
+	commercial/proprietary software, as long as You comply with Sections
+	3, 4 and 8 below. <br>      For the matter of clarity, no
+	restrictions regarding fees, either as to a copyright-license fee or
+	as to a selling fee for the copy as such apply.</p></li>
+	<li><p>
+	To perform the Original Work publicly.</p></li>
+	<li><p>
+	To display the Original Work publicly.</p></li>
+</ol>
+
+<p>
+<b>3. Acceptance.</b> Any use of the Original Work or a
+Derivative Work, or any action according to either Section 2a) to 2f)
+above constitutes Your acceptance of this License.</p>
+
+<p>
+<b>4. Designation of Derivative Works and of Modified Works.
+</b>The identifying designation of Derivative Work and of Modified
+Work must be different to the corresponding identifying designation
+of the Original Work. This means especially that the (root-level)
+name of a Modelica package under this license must be changed if the
+package is modified (besides fixing of errors, adding vendor specific
+Modelica annotations, using a subset of the classes of a Modelica
+package, or using another representation, e.g. a binary
+representation).</p>
+
+<p>
+<b>5. Grant of Patent License.</b>
+Licensor grants You a worldwide, royalty-free, non-exclusive, sublicensable license,
+under patent claims owned by the Licensor or licensed to the Licensor by
+the owners of the Original Work that are embodied in the Original Work
+as furnished by the Licensor, for the duration of the patents,
+to make, use, sell, offer for sale, have made, and import the Original Work
+and Derivative Works under the conditions as given in Section 2.
+For the matter of clarity, the license regarding Derivative Works covers
+patent claims to the extent as they are embodied in the Original Work only.</p>
+
+<p>
+<b>6. Provision of Source Code.</b> Licensor agrees to provide
+You with a copy of the Source Code of the Original Work but reserves
+the right to decide freely on the manner of how the Original Work is
+provided.<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;For the matter of clarity, Licensor might provide only a binary
+representation of the Original Work. In that case, You may (a) either
+reproduce the Source Code from the binary representation if this is
+possible (e.g., by performing a copy of an encrypted Modelica
+package, if encryption allows the copy operation) or (b) request the
+Source Code from the Licensor who will provide it to You.</p>
+
+<p>
+<b>7. Exclusions from License Grant.</b> Neither the names of
+Licensor, nor the names of any contributors to the Original Work, nor
+any of their trademarks or service marks, may be used to endorse or
+promote products derived from this Original Work without express
+prior permission of the Licensor. Except as otherwise expressly
+stated in this License and in particular in Sections 2 and 5, nothing
+in this License grants any license to Licensor&rsquo;s trademarks,
+copyrights, patents, trade secrets or any other intellectual
+property, and no patent license is granted to make, use, sell, offer
+for sale, have made, or import embodiments of any patent claims.<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;No license is granted to the trademarks of
+Licensor even if such trademarks are included in the Original Work,
+except as expressly stated in this License. Nothing in this License
+shall be interpreted to prohibit Licensor from licensing under terms
+different from this License any Original Work that Licensor otherwise
+would have a right to license.</p>
+
+<p>
+<b>8. Attribution Rights.</b> You must retain in the Source
+Code of the Original Work and of any Derivative Works that You
+create, all author, copyright, patent, or trademark notices, as well
+as any descriptive text identified therein as an &quot;Attribution
+Notice&quot;. The same applies to the licensing notice of this
+License in the Original Work. For the matter of clarity, &ldquo;author
+notice&rdquo; means the notice that identifies the original
+author(s). <br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;You must cause the Source Code for any Derivative
+Works that You create to carry a prominent Attribution Notice
+reasonably calculated to inform recipients that You have modified the
+Original Work. <br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;In case the Original Work or Derivative Work is not provided in
+Source Code, the Attribution Notices shall be appropriately
+displayed, e.g., in the documentation of the Derivative Work.</p>
+
+<p><b>9. Disclaimer
+of Warranty. <br></b><u><b>The Original Work is provided under this
+License on an &quot;as is&quot; basis and without warranty, either
+express or implied, including, without limitation, the warranties of
+non-infringement, merchantability or fitness for a particular
+purpose. The entire risk as to the quality of the Original Work is
+with You.</b></u> This disclaimer of warranty constitutes an
+essential part of this License. No license to the Original Work is
+granted by this License except under this disclaimer.</p>
+
+<p>
+<b>10. Limitation of Liability.</b> Under no circumstances and
+under no legal theory, whether in tort (including negligence),
+contract, or otherwise, shall the Licensor, the owner or a licensee
+of the Original Work be liable to anyone for any direct, indirect,
+general, special, incidental, or consequential damages of any
+character arising as a result of this License or the use of the
+Original Work including, without limitation, damages for loss of
+goodwill, work stoppage, computer failure or malfunction, or any and
+all other commercial damages or losses. This limitation of liability
+shall not apply to the extent applicable law prohibits such
+limitation.</p>
+
+<p>
+<b>11. Termination.</b> This License conditions your rights to
+undertake the activities listed in Section 2 and 5, including your
+right to create Derivative Works based upon the Original Work, and
+doing so without observing these terms and conditions is prohibited
+by copyright law and international treaty. Nothing in this License is
+intended to affect copyright exceptions and limitations. This License
+shall terminate immediately and You may no longer exercise any of the
+rights granted to You by this License upon your failure to observe
+the conditions of this license.</p>
+
+<p>
+<b>12. Termination for Patent Action.</b> This License shall
+terminate automatically and You may no longer exercise any of the
+rights granted to You by this License as of the date You commence an
+action, including a cross-claim or counterclaim, against Licensor,
+any owners of the Original Work or any licensee alleging that the
+Original Work infringes a patent. This termination provision shall
+not apply for an action alleging patent infringement through
+combinations of the Original Work under combination with other
+software or hardware.</p>
+
+<p>
+<b>13. Jurisdiction.</b> Any action or suit relating to this
+License may be brought only in the courts of a jurisdiction wherein
+the Licensor resides and under the laws of that jurisdiction
+excluding its conflict-of-law provisions. The application of the
+United Nations Convention on Contracts for the International Sale of
+Goods is expressly excluded. Any use of the Original Work outside the
+scope of this License or after its termination shall be subject to
+the requirements and penalties of copyright or patent law in the
+appropriate jurisdiction. This section shall survive the termination
+of this License.</p>
+
+<p>
+<b>14. Attorneys&rsquo; Fees.</b> In any action to enforce the
+terms of this License or seeking damages relating thereto, the
+prevailing party shall be entitled to recover its costs and expenses,
+including, without limitation, reasonable attorneys' fees and costs
+incurred in connection with such action, including any appeal of such
+action. This section shall survive the termination of this License.</p>
+
+<p>
+<b>15. Miscellaneous.</b>
+</p>
+<ol type=\"a\">
+	<li>If any
+	provision of this License is held to be unenforceable, such
+	provision shall be reformed only to the extent necessary to make it
+	enforceable.</li>
+
+	<li>No verbal
+	ancillary agreements have been made. Changes and additions to this
+	License must appear in writing to be valid. This also applies to
+	changing the clause pertaining to written form.</li>
+
+	<li>You may use the
+	Original Work in all ways not otherwise restricted or conditioned by
+	this License or by law, and Licensor promises not to interfere with
+	or be responsible for such uses by You.</li>
+</ol>
+</p>
+
+<!--%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%-->
+<!--/////////////////////////////////////////////////////////////////////////////-->
+<!--%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%-->
+<a name="ack">
+<a href="#top"><img src="./images/Icon-Top.png" height="12">&nbsp;Go to top</a>
+<section><h1>Acknowledgements</h1></section>
+<p>
+This work was fully supported by an ERCIM &quot;Alain Bensoussan&quot; post-doctoral research fellowship, hosted by VTT Technical Research Centre of Finland.  The author wishes to thank A. Ashgar, A. Pop, and M. Sj&ouml;lund for technical advice related to OMPython and FMUs.
+</p>
+
+<!--%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%-->
+<!--/////////////////////////////////////////////////////////////////////////////-->
+<!--%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%-->
+<a name="ref">
+<a href="#top"><img src="./images/Icon-Top.png" height="12">&nbsp;Go to top</a>
+<section><h1>References</h1></section>
+<p>
+G. A. Bekey, G. O. Burnham, and J. Seo.  Control theoretic models of human drivers in car following. Human Factors, 19(4):399--413, Aug. 1977.  H. J. Damveld, G. C. Beerens, M. M. van Paassen, and M. Mulder. Design of forcing functions for the identification of hu- man control behavior. <em>AIAA Journal of Guidance, Control, and Dynamics</em>, 33(4):1064--1081, Jul.-Aug. 2010.
+<p></p>
+
+F. M. Drop, D. M. Pool, H. J. Damveld, M. M. van Paassen, and M. Mulder.  Identification of the feedforward component in manual control with predictable target signals. <em>IEEE Transactions on Cybernetics</em>, 43(6):1936--1949, Dec. 2013.
+<p></p>
+
+P. Fritzson, P. Aronsson, H. Lundvall, K. Nystr&#246;m, A. Pop, L. Saldamli, and D. Broman.  The OpenModelica Modeling, Simulation, and Software Development Environment. <em>Simulation News Europe,</em> 44(45), Dec. 2005.
+<p></p>
+
+S. Gedda, C. Andersson, J. &#196;kesson, and S. Diehl. Derivative-free parameter optimization of functional mock-up units. In <em>Proc. 9th Int. Modelica Conf.</em>, Munich, Germany, Sep. 2012.
+<p></p>
+
+R. A. Hess.  A rationale for human operator pulsive control behavior. <em>Journal of Guidance and Control</em>, 2(3):221--227, May-Jun. 1979.
+<p></p>
+
+R. A. Hess.  A structural model of the adaptive human pilot.  <em>AIAA Journal  of Guidance, Control, and Dynamics</em>, 3(5):416--423, Sep.-Oct. 1980.
+<p></p>
+
+R. A. Hess. <em>Feedback Control Models -- Manual Control and Tracking</em>, chapter 38, pages 1249--1294. John Wiley &amp; Sons, Inc., Hoboken, NJ, 3 edition, 2006.
+<p></p>
+
+R. A. Hess and A. Modjtahedzadeh. A control theoretic model of driver steering behavior.  <em>IEEE Control Systems Magazine</em>, 10(5):3--8, Aug. 1990. doi:10.1109/37.60415.
+<p></p>
+
+R. Hosman and H. Stassen.  Pilot's perception in the control of aircraft motions. <em>Control Engineering Practice</em>, 7:1421--
+1428, 1999.
+<p></p>
+
+R. J. Jagacinski. A qualitative look at feedback control theory as a style of describing behavior. <em>Human Factors</em>, 19:331--347, Aug. 1977.
+<p></p>
+
+R. J. Jagacinski and J. M. Flach. <em>Control Theory for Humans: Quantitative Approaches to Modeling Performance</em>.  CRC Press, New York, NY, 2003.
+<p></p>
+
+H. R. Jex, J. D. McDonnell, and A. V. Phatak.  A &quot;critical&quot; tracking task for manual control research.  <em>IEEE Transactions on Human Factors in Electronics</em>, HFE-7(4):138--145, Dec. 1966. doi:10.1109/THFE.1966.232660.
+<p></p>
+
+J.  &#196;kesson,  K.-E.  &#196;rz&#233;n,  M.  G&#228;fvert,  T.  Bergdahl,  and H. Tummescheit.   Modeling and optimization with optimica and jmodelica.org---languages and tools for solving large-scale dynamic optimization problems. <em>Computers and Chemical Engineering</em>, 34(11):1737--1749, Nov. 2010.
+<p></p>
+
+D. L. Kleinman and T. R. Perkins.  Modeling human performance in a time-varying anti-aircraft tracking loop.  <em>IEEE Transactions on Automatic Control</em>,  AC-19(4):297--306, Aug. 1974.
+<p></p>
+
+D. T. McRuer. Human dynamics in man-machine systems. <em>Automatica</em>, 16(3):237--253, May 1980.
+<p></p>
+
+D. T. McRuer and H. R. Jex.  A review of quasi-linear pilot models.  <em>IEEE Transactions on Human Factors in Electronics</em>, HFE-8(3):231--249, Sep. 1967. doi:10.1109/THFE.1967.234304.
+<p></p>
+
+D. T. McRuer, D. Graham, E. S. Krendel, and W. Reisner. Human pilot dynamics in compensatory systems.  Technical Report AFFDL-TR-65-15, Air Force Flight Dynamics Lab- oratory, Wright-Patterson AFB, OH, 1965.
+<p></p>
+
+D. T. McRuer, D. Graham, and E. S. Krendel.  Manual control of single-loop systems: Part I. <em>Journal of the Franklin Institute</em>, 283(1):1--29, Jan. 1967.
+<p></p>
+
+D. T. McRuer, D. H. Weir, H. R. Jex, R. E. Magdaleno, and R. W. Allen.  Measurement of driver-vehicle multiloop response properties with a single disturbance input.  <em>IEEE Transactions on Systems, Man, and Cybernetics</em>, SMC-5(5):490--497, 1975. doi:10.1109/TSMC.1975.5408371.
+<p></p>
+
+F. M. Nieuwenhuizen, P. M. T. Zaal, M. Mulder, M. M. van Paassen, and J. A. Mulder. Modeling human multichannel perception and control using linear time-invariant models. <em>Journal  of Guidance, Control, and Dynamics</em>, 31(4):999--1013, Jul.-Aug. 2008.
+<p></p>
+
+J. J. Potter and W. E. Singhose.  Effects of input shaping on manual control of flexible and time-delayed systems.  <em>Human Factors</em>, 56(7):1284--1295, Nov. 2014.
+<p></p>
+
+R.S. Shirley and L.R. Young. Motion cues in man-vehicle control: effects of roll-motion cues on human operator's behavior in compensatory systems with disturbance inputs. <em>IEEE Transactions on Man-Machine Systems</em>, 9(4):121--128, Dec. 1968.
+<p></p>
+
+E. P. Todosiev, R. E. Rose, and L. G. Summers.  Human performance in single and two-axis tracking systems.   <em>IEEE Transactions on Human Factors in Electronics</em>, HFE-8(2):125--129, Jun. 1967.
+<p></p>
+
+A. Tustin. The nature of the operator's response in manual control, and its implications for controller design. <em>Journal of the Institution of Electrical Engineers</em>, 94(2):190--206, May 1947.
+<p></p>
+
+M. M. Van Paassen and M. Mulder. <em>International Encyclopedia of Ergonomics and Human Factors</em>, volume 1, chapter Identification of Human Control Behavior, pages 400--407. Taylor and Francis, London, 2 edition, 2006.
+<p></p>
+
+A. R. Wade and H. R. Jex.  A simple Fourier analysis technique for measuring the dynamic response of manual  control  systems.  <em>IEEE Transactions on Systems, Man, and Cybernetics</em>, SMC-2(5):638--643, Nov. 1972. doi:10.1109/TSMC.1972.4309192.
+<p></p>
+
+P. M. T. Zaal, D. M. Pool, M. M. van Paassen, and M. Mulder.  Comparing multimodal pilot pitch control behavior between simulated and real flight. <em>Journal of Guidance, Control, and Dynamics</em>, 35(5):1456--1471, Sep.-Oct. 2012.
+</p>
+<a href="#top"><img src="./images/Icon-Top.png" height="12">&nbsp;Go to top</a>
+
+</body>
+</html>
+
